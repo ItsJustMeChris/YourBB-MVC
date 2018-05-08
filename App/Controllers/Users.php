@@ -28,11 +28,18 @@ class Users extends \Core\Controller
     public function logInAction()
     {
         if (isset($_POST['username']) && isset($_POST['password'])) {
-            User::login($_POST['username'], $_POST['password']);
+            if (User::login($_POST['username'], $_POST['password'])) {
+                $data = [ 'type' => 'success', 'title' => 'yay!', 'text' => 'Login successful, redirecting!' ];
+            } else {
+                $data = [ 'type' => 'error', 'title' => 'oh no!', 'text' => 'Your login information was incorrect!' ];
+            }
+            header('Content-type: application/json');
+            echo json_encode( $data );        
+        } else {
+            View::renderTemplate('User/login.html', [
+                'session' => Session::get('user')
+            ]);
         }
-        View::renderTemplate('User/login.html', [
-            'session' => Session::get('user')
-        ]);
     }
 
     public function logOutAction()

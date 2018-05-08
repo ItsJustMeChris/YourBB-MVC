@@ -12,11 +12,14 @@ class User extends \Core\Model
         //        $arr = static::select('user', 'username=? AND password=?', ['Joe', '$2y$10$d2BxUUNCV38YHhEowAef0em6fqTtA6iymhR4dLVyTmcW0P6hjhIB6']);
         if (isset($_POST['username']) && isset($_POST['password'])) {
             $arr = static::select('user', 'username=?', [$username]);
-            if (password_verify($password, $arr[0]['password'])) {
-                echo "Logged In";
-                Session::put('user', $arr[0]['userkey']);
+            if ($arr) {
+                if (password_verify($password, $arr[0]['password'])) {
+                    Session::put('user', $arr[0]['userkey']);
+                    return true;
+                }
             }
         }
+        return false;
     }
 
     public static function create($stuff) 
@@ -28,7 +31,6 @@ class User extends \Core\Model
                 'password' => $passwordHashed,
                 'userkey' => bin2hex(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM))
             );
-    
             static::insert('user', $test);    
         }
     }
